@@ -1,31 +1,26 @@
-import TeleBot from "telebot";
-import { database, ref, get } from './config';
+import TeleBot from 'telebot';
+import { database, ref, get } from './config'; // убедитесь, что вы правильно настроили Firebase
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.on(['/rep'], (msg) => {
+bot.on('/rep', async (msg) => {
     const chatId = msg.chat.id;
+    const usersRef = ref(database, 'user'); // путь к узлу 'user'
 
-    // Создаем ссылку на всех пользователей в базе данных Firebase
-    const usersRef = ref(database, 'users');
+    const snapshot = await get(usersRef);
+    if (snapshot.exists()) {
+        const data = snapshot.val();
+        let repMessage = 'Количество rep для каждого пользователя:\n';
 
-    // Получаем все данные пользователей
-    get(usersRef).then((snapshot) => {
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            let response = 'Репутация пользователей:\n';
-
-            // Проходим по всем пользователям и собираем информацию о репутации
-            for (const key in users) {
-                if (users[key].rep !== undefined) {
-                    response += `Имя: ${key}, Репутация: ${users[key].rep}\n`;
-                }
+        // Проходим по всем пользователям и добавляем их значения rep в сообщение
+        for (const userId in data) {
+            if (data[userId].rep) {
+                repMessage += `${userId}: ${data[userId].rep}\n`;
             }
-
-            // Отправляем сообщение с количеством репутаций
-            bot.sendMessage(chatId, response);
         }
-    });
+
+        return bot.sendMessage(chatId, repMessage);
+    }
 });
 
 export default bot;
