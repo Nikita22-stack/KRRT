@@ -2,11 +2,11 @@ import TeleBot from "telebot"
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
 
-bot.on(['+реп'], (msg) => {
+bot.on(['/rep'], (msg) => {
     const chatId = msg.from.id;
     const username = msg.from.first_name;
 
-    // Создаем клавиатуру с одной кнопкой для 
+    // Создаем клавиатуру с одной кнопкой для web_app
     const keyboard = {
         inline_keyboard: [
             [
