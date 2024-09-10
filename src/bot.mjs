@@ -21,7 +21,7 @@ bot.on('/rep', (msg) => {
         chatId,
         `Привет, ${username}! Прикоснись к воде. 💦`,
         { replyMarkup: keyboard }
-    ).catch(error => console.error('Error sending message:', error));
+    );
 });
 
 // Запуск бота
