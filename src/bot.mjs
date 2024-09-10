@@ -6,7 +6,6 @@ bot.on(['/rep'], (msg) => {
     const chatId = msg.chat.id;
     const username = msg.from.first_name;
 
-    // Отправляем сообщение с клавиатурой и никнеймом пользователя
     return bot.sendMessage(chatId, `Привет, ${username}! Прикоснись к воде. 💦`);
 });
 
