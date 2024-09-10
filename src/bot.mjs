@@ -1,5 +1,5 @@
 import TeleBot from "telebot";
-import { database, ref, onValue } from './components/config';
+import { database, ref, onValue } from './config';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
