@@ -11,7 +11,7 @@ bot.on(['/rep'], (msg) => {
         inline_keyboard: [
             [
                 {
-                    text: 'Открыть приложение',
+                    text: 'НА',
                     web_app: { url: 'https://watertouch.vercel.app/' }
                 }
             ]
