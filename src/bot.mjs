@@ -7,4 +7,5 @@ bot.on(['/rep'], (msg) => {
     bot.sendMessage(chatId, 'Привет!');
 });
 
+bot.start();
 export default bot;
