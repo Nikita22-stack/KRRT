@@ -4,7 +4,8 @@ const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
 
 bot.on(['/rep'], (msg) => {
     const chatId = msg.chat.id;
-    bot.sendMessage(chatId, 'Привет!');
+
+    return bot.sendMessage(chatId, 'Привет!');
 });
 
-bot.start();
+export default bot
