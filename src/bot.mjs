@@ -1,7 +1,7 @@
-import TeleBot from "telebot"
-import { database, ref, set, update } from './config';
+import TeleBot from "telebot";
+import { database, ref, onValue } from './config';
 
-const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
+const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.on(['/rep'], (msg) => {
     const chatId = msg.chat.id;
@@ -26,4 +26,4 @@ bot.on(['/rep'], (msg) => {
     });
 });
 
-export default bot
+export default bot;
