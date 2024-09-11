@@ -8,39 +8,9 @@ bot.on('text', async (msg) => {
     const chatId = msg.chat.id;
     const messageText = msg.text.trim();
 
-    // Проверяем, содержит ли сообщение команду '+aura'
-    if (messageText.toLowerCase().startsWith('+aura')) {
-        const args = messageText.split(' ');
-
-        if (args.length === 3) {
-            const userName = args[1];
-            const auraToAdd = parseInt(args[2]);
-
-            if (!isNaN(auraToAdd)) {
-                const userRef = ref(database, `user/${userName}`);
-                const snapshot = await get(userRef);
-
-                if (snapshot.exists()) {
-                    const currentAura = snapshot.val().aura || 0;
-                    const newAura = currentAura + auraToAdd;
-
-                    // Обновляем значение aura в базе данных
-                    await update(userRef, { aura: newAura });
-
-                    return bot.sendMessage(chatId, `${userName} теперь имеет aura: ${newAura}`);
-                } else {
-                    return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
-                }
-            } else {
-                return bot.sendMessage(chatId, 'Пожалуйста, укажите правильное количество aura.');
-            }
-        } else {
-            return bot.sendMessage(chatId, 'Использование: +aura <имя пользователя> <количество>');
-        }
-    }
-
     // Проверяем, содержит ли сообщение слово 'aura'
     if (messageText.toLowerCase() === 'aura') {
+        // Создаем ссылку на все данные в узле 'user'
         const usersRef = ref(database, 'user');
         const snapshot = await get(usersRef);
 
@@ -50,10 +20,41 @@ bot.on('text', async (msg) => {
 
             // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
-                response += `${user}: ${info.aura || 0}\n`;
+                response += `${user}: ${info.aura}\n`;
             }
 
             return bot.sendMessage(chatId, response);
+        }
+    }
+
+    // Проверяем, начинается ли сообщение с '+aura'
+    if (messageText.startsWith('+aura')) {
+        const parts = messageText.split(' ');
+
+        if (parts.length === 3) {
+            const userName = parts[1];
+            const auraToAdd = parseInt(parts[2], 10);
+
+            if (!isNaN(auraToAdd)) {
+                const userRef = ref(database, `user/${userName}`);
+                const userSnapshot = await get(userRef);
+
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.val();
+                    const updatedAura = userData.aura + auraToAdd;
+
+                    // Обновляем значение 'aura' в базе данных
+                    await update(userRef, { aura: updatedAura });
+
+                    return bot.sendMessage(chatId, `${userName} теперь имеет ${updatedAura} aura.`);
+                } else {
+                    return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
+                }
+            } else {
+                return bot.sendMessage(chatId, 'Введите корректное количество aura.');
+            }
+        } else {
+            return bot.sendMessage(chatId, 'Используйте формат: +aura <имя пользователя> <количество>');
         }
     }
 });
