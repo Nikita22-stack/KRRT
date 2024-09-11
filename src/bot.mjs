@@ -74,6 +74,7 @@ bot.on('text', async (msg) => {
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.val();
                     const updatedAura = userData.aura - auraToAdd;
+                    const userId = userData.id;
 
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
