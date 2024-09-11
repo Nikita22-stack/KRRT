@@ -1,26 +1,13 @@
-import TeleBot from 'telebot';
-import { database, ref, get } from './config'; // убедитесь, что вы правильно настроили Firebase
+import TeleBot from "telebot"
 
-const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
 
-bot.on('/rep', async (msg) => {
+bot.on(['/rep'], (msg) => {
     const chatId = msg.chat.id;
-    const usersRef = ref(database, 'user'); // путь к узлу 'user'
-
-    const snapshot = await get(usersRef);
-    if (snapshot.exists()) {
-        const data = snapshot.val();
-        let repMessage = 'Количество rep для каждого пользователя:\n';
-
-        // Проходим по всем пользователям и добавляем их значения rep в сообщение
-        for (const userId in data) {
-            if (data[userId].rep) {
-                repMessage += `${userId}: ${data[userId].rep}\n`;
-            }
-        }
-
-        return bot.sendMessage(chatId, repMessage);
-    }
+    const username = msg.from.first_name;
+    
+    // Отправляем сообщение с клавиатурой и никнеймом пользователя
+    return bot.sendMessage(chatId, `Привет, ${username}!`);
 });
 
-export default bot;
+export default bot
