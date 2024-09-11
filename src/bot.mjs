@@ -20,15 +20,15 @@ bot.on('text', async (msg) => {
 
             // Соответствие между именами в БД и хэндлами Telegram
             const userHandles = {
-                'Вадим': '@starkoww',
-                'Никита': '@MurcieIago7',
-                'Ярик': '@qqqqqqq12326'
+                'Вадим': 'starkoww',
+                'Никита': 'MurcieIago7',
+                'Ярик': 'qqqqqqq12326'
             };
 
             // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
                 const handle = userHandles[user] || user;
-                response += `[${user}](tg://user?id=${handle}): ${info.aura}\n`;
+                response += `[${user}](tg://resolve?domain=${handle}): ${info.aura}\n`;
             }
 
             // Отправляем сообщение с режимом parse_mode: 'MarkdownV2' для обработки Markdown
