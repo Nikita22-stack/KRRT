@@ -18,17 +18,10 @@ bot.on('text', async (msg) => {
             const data = snapshot.val();
             let response = '🧿 Количество aura 🧿\n\n';
 
-            // Соответствие между именами в БД и хэндлами Telegram
-            const userHandles = {
-                'Вадим': 'starkoww',
-                'Никита': 'MurcieIago7',
-                'Ярик': 'qqqqqqq12326'
-            };
-
             // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
-                const handle = userHandles[user] || user;
-                response += `[${user}](tg://resolve?domain=${handle}): ${info.aura}\n`;
+                const userId = info.id;
+                response += `[${user}](tg://user?id=${userId}): ${info.aura}\n`;
             }
 
             // Используем MarkdownV2 для корректного форматирования
