@@ -3,21 +3,30 @@ import { database, ref, get } from './config';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.on('/rep', async (msg) => {
-    const chatId = msg.chat.id;
+bot.on(['/rep'], async (msg) => {
+  const chatId = msg.chat.id;
 
-    // Ссылка на данные в Firebase
-    const repRef = ref(database, 'user/Waik/rep');
-    const snapshot = await get(repRef);
+  try {
+    // Получите данные из Firebase
+    const dbRef = ref(database, 'user/Waik/rep'); // Укажите путь к вашим данным
+    const snapshot = await get(dbRef);
 
     if (snapshot.exists()) {
-        const repValue = snapshot.val();
-        // Отправляем сообщение с количеством rep
-        bot.sendMessage(chatId, `Количество реп: ${repValue}`);
+      const data = snapshot.val();
+      
+      // Обработка данных и отправка сообщения
+      return bot.sendMessage(chatId, `Данные: ${JSON.stringify(data)}`);
+    } else {
+      return bot.sendMessage(chatId, 'Нет данных в базе.');
     }
+  } catch (error) {
+    console.error('Ошибка при получении данных из Firebase:', error);
+    return bot.sendMessage(chatId, 'Произошла ошибка при получении данных.');
+  }
 });
 
 export default bot;
+
 
 
 /*
