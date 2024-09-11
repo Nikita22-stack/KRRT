@@ -3,11 +3,11 @@ import { database, ref, get } from "./config"
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
 
-bot.on('/rep', async (msg) => {
+bot.on('/rep', (msg) => {
     const chatId = msg.chat.id;
     const usersRef = ref(database, 'user'); // путь к узлу 'user'
 
-    const snapshot = await get(usersRef);
+    const snapshot = get(usersRef);
     if (snapshot.exists()) {
         const data = snapshot.val();
         let repMessage = 'Количество rep для каждого пользователя:\n';
