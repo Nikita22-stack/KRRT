@@ -3,7 +3,7 @@ import { database, ref, get } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.on('/rep', async (msg) => {
+bot.on('aura', async (msg) => {
     const chatId = msg.chat.id;
 
     // Создаем ссылку на все данные в узле 'user'
@@ -12,11 +12,11 @@ bot.on('/rep', async (msg) => {
 
     if (snapshot.exists()) {
         const data = snapshot.val();
-        let response = 'Количество реп для всех пользователей:\n';
+        let response = 'Количество aura:\n';
 
         // Проходимся по всем пользователям и добавляем их данные в сообщение
         for (const [user, info] of Object.entries(data)) {
-            response += `${user}: ${info.rep}\n`;
+            response += `${user}: ${info.aura}\n`;
         }
 
         return bot.sendMessage(chatId, response);
