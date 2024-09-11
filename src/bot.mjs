@@ -21,11 +21,11 @@ bot.on('text', async (msg) => {
             // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
                 const userId = info.id;
-                response += `[${user}](tg://user?id=${userId}): ${info.aura}\n`;
+                response += `<a href="tg://user?id=${userId}">${user}</a>: ${info.aura}\n`;
             }
 
-            // Используем MarkdownV2 для корректного форматирования
-            return bot.sendMessage(chatId, response, { parse_mode: 'MarkdownV2' });
+            // Отправляем сообщение с режимом parse_mode: 'HTML' для обработки HTML-тегов
+            return bot.sendMessage(chatId, response, { parse_mode: 'HTML' });
         }
     }
 
@@ -48,7 +48,11 @@ bot.on('text', async (msg) => {
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(chatId, `👍 ${userName} теперь имеет ${updatedAura} aura.`);
+                    return bot.sendMessage(
+                        chatId,
+                        `👍 [${userName}](tg://user?id=${userData.id}) теперь имеет ${updatedAura} aura.`,
+                        { parse_mode: 'MarkdownV2' }
+                    );
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
@@ -79,7 +83,11 @@ bot.on('text', async (msg) => {
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(chatId, `🤡 ${userName} теперь имеет ${updatedAura} aura.`);
+                    return bot.sendMessage(
+                        chatId,
+                        `🤡 [${userName}](tg://user?id=${userData.id}) теперь имеет ${updatedAura} aura.`,
+                        { parse_mode: 'MarkdownV2' }
+                    );
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
