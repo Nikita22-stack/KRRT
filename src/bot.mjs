@@ -3,13 +3,11 @@ import { database, ref, get, update } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-// Создаем клавиатуру для выбора действия +aura или -aura
 const actionKeyboard = bot.keyboard([
     ['+aura', '-aura']
 ], { resize: true });
 
-// Создаем клавиатуру для выбора пользователя
-const userKeyboard = async (chatId) => {
+const userKeyboard = async () => {
     const usersRef = ref(database, 'user');
     const snapshot = await get(usersRef);
 
@@ -21,51 +19,67 @@ const userKeyboard = async (chatId) => {
     return bot.keyboard([]);
 };
 
-// Создаем клавиатуру для добавления или убавления значения aura
 const modifyKeyboard = bot.keyboard([
     ['Прибавить', 'Отнять']
 ], { resize: true });
 
-bot.on('text', async (msg) => {
+// Храним состояние бота для каждого чата
+const chatState = {};
+
+bot.on('aura', async (msg) => {
     const chatId = msg.chat.id;
     const messageText = msg.text.trim().toLowerCase();
+    const userId = msg.from.id;
 
-    // Обработка команды для показа выбора действия
-    if (messageText === '+aura' || messageText === '-aura') {
-        return bot.sendMessage(chatId, 'Выберите пользователя:', { replyMarkup: await userKeyboard(chatId) });
+    if (!chatState[chatId]) {
+        chatState[chatId] = { step: null, user: null };
     }
 
-    // Обработка выбора пользователя
-    const usersRef = ref(database, 'user');
-    const snapshot = await get(usersRef);
+    const state = chatState[chatId];
 
-    if (snapshot.exists()) {
-        const data = snapshot.val();
-
-        // Проверяем, выбрал ли пользователь пользователя
-        if (data[messageText]) {
-            return bot.sendMessage(chatId, 'Выберите действие:', { replyMarkup: modifyKeyboard });
+    if (state.step === null) {
+        if (messageText === '+aura' || messageText === '-aura') {
+            state.step = 'selectUser';
+            return bot.sendMessage(chatId, 'Выберите пользователя:', { replyMarkup: await userKeyboard() });
         }
+    } else if (state.step === 'selectUser') {
+        const usersRef = ref(database, 'user');
+        const snapshot = await get(usersRef);
 
-        // Проверяем, выбрал ли пользователь действие
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            if (data[messageText]) {
+                state.user = messageText;
+                state.step = 'selectAction';
+                return bot.sendMessage(chatId, 'Выберите действие:', { replyMarkup: modifyKeyboard });
+            }
+        }
+    } else if (state.step === 'selectAction') {
         if (messageText === 'прибавить' || messageText === 'отнять') {
-            return bot.sendMessage(chatId, `Введите количество для ${messageText === 'прибавить' ? 'добавления' : 'убавления'}:`)
-                .then(() => {
-                    bot.once('text', async (response) => {
-                        const amount = parseInt(response.text.trim(), 10);
-                        if (!isNaN(amount)) {
-                            const user = msg.text.trim();
-                            const newAura = data[user].aura + (messageText === 'прибавить' ? amount : -amount);
+            state.step = 'modifyAura';
+            state.action = messageText;
+            return bot.sendMessage(chatId, `Введите количество для ${messageText === 'прибавить' ? 'добавления' : 'убавления'}:`);
+        }
+    } else if (state.step === 'modifyAura') {
+        const amount = parseInt(messageText, 10);
+        if (!isNaN(amount)) {
+            const user = state.user;
+            const usersRef = ref(database, `user/${user}`);
+            const snapshot = await get(usersRef);
 
-                            // Обновляем значение aura в базе данных
-                            await update(ref(database, `user/${user}`), { aura: newAura });
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const newAura = data.aura + (state.action === 'прибавить' ? amount : -amount);
 
-                            return bot.sendMessage(chatId, `Aura ${messageText === 'прибавить' ? 'добавлена' : 'убавлена'} на ${amount}.`);
-                        } else {
-                            return bot.sendMessage(chatId, 'Введите корректное количество.');
-                        }
-                    });
-                });
+                await update(usersRef, { aura: newAura });
+
+                bot.sendMessage(chatId, `Aura ${state.action === 'прибавить' ? 'добавлена' : 'убавлена'} на ${amount}.`);
+                state.step = null;
+                state.user = null;
+                state.action = null;
+            }
+        } else {
+            bot.sendMessage(chatId, 'Введите корректное количество.');
         }
     }
 });
