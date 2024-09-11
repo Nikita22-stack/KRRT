@@ -5,21 +5,12 @@ const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.on('/rep', async (msg) => {
     const chatId = msg.chat.id;
-    const usersRef = ref(database, 'user'); // путь к узлу 'user'
+    const repRef = ref(database, 'user/waik/rep'); // путь к вашему узлу в Firebase
 
-    const snapshot = await get(usersRef);
+    const snapshot = await get(repRef);
     if (snapshot.exists()) {
-        const data = snapshot.val();
-        let repMessage = 'Количество rep для каждого пользователя:\n';
-
-        // Проходим по всем пользователям и добавляем их значения rep в сообщение
-        for (const userId in data) {
-            if (data[userId].rep) {
-                repMessage += `${userId}: ${data[userId].rep}\n`;
-            }
-        }
-
-        return bot.sendMessage(chatId, repMessage);
+        const repValue = snapshot.val();
+        return bot.sendMessage(chatId, `Текущее значение rep: ${repValue}`);
     }
 });
 
