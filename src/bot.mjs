@@ -1,17 +1,12 @@
-import TeleBot from 'telebot';
-import { database, ref, get } from './config'; // убедитесь, что вы правильно настроили Firebase
+import TeleBot from "telebot"
+import { database, ref, get } from './config';
 
-const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN)
 
-bot.on('/rep', async (msg) => {
+bot.on(['/rep'], (msg) => {
     const chatId = msg.chat.id;
-    const repRef = ref(database, 'user/waik/rep'); // путь к вашему узлу в Firebase
 
-    const snapshot = await get(repRef);
-    if (snapshot.exists()) {
-        const repValue = snapshot.val();
-        return bot.sendMessage(chatId, `Текущее значение rep: ${repValue}`);
-    }
+    return bot.sendMessage(chatId, `фф`);
 });
 
-export default bot;
+export default bot
