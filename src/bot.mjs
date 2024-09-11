@@ -3,16 +3,14 @@ import { database, ref, get } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-// Создаем клавиатуру с двумя кнопками
-const keyboard = bot.keyboard([
-    ['/aura +aura', '/aura -aura']
-], { resize: true });
-
-bot.on('aura', async (msg) => {
+// Обрабатываем текстовые сообщения
+bot.on('text', async (msg) => {
     const chatId = msg.chat.id;
-    const messageText = msg.text.trim().toLowerCase();
+    const messageText = msg.text.trim();
 
-    if (messageText === 'aura') {
+    // Проверяем, содержит ли сообщение слово 'aura'
+    if (messageText.toLowerCase() === 'aura') {
+        // Создаем ссылку на все данные в узле 'user'
         const usersRef = ref(database, 'user');
         const snapshot = await get(usersRef);
 
@@ -20,11 +18,12 @@ bot.on('aura', async (msg) => {
             const data = snapshot.val();
             let response = 'Количество aura:\n';
 
+            // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
                 response += `${user}: ${info.aura}\n`;
             }
 
-            return bot.sendMessage(chatId, response, { replyMarkup: keyboard });
+            return bot.sendMessage(chatId, response);
         }
     }
 });
