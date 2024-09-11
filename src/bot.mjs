@@ -31,7 +31,7 @@ bot.on('text', async (msg) => {
                 response += `[${user}](tg://resolve?domain=${handle}): ${info.aura}\n`;
             }
 
-            // Отправляем сообщение с режимом parse_mode: 'MarkdownV2' для обработки Markdown
+            // Используем MarkdownV2 для корректного форматирования
             return bot.sendMessage(chatId, response, { parse_mode: 'MarkdownV2' });
         }
     }
