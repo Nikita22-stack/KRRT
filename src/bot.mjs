@@ -3,7 +3,7 @@ import { database, ref, get, update } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-// Обрабатываем текстовые сообщения
+// Обрабатываем сообщения
 bot.on('text', async (msg) => {
     const chatId = msg.chat.id;
     const messageText = msg.text.trim();
@@ -20,12 +20,10 @@ bot.on('text', async (msg) => {
 
             // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [user, info] of Object.entries(data)) {
-                const userId = info.id;
-                response += `<a href="tg://user?id=${userId}">${user}</a>: ${info.aura}\n`;
+                response += `${user}: ${info.aura}\n`;
             }
 
-            // Отправляем сообщение с режимом parse_mode: 'HTML' для обработки HTML-тегов
-            return bot.sendMessage(chatId, response, { parse_mode: 'HTML' });
+            return bot.sendMessage(chatId, response);
         }
     }
 
@@ -48,11 +46,7 @@ bot.on('text', async (msg) => {
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(
-                        chatId,
-                        `👍 [${userName}](tg://user?id=${userData.id}) теперь имеет ${updatedAura} aura.`,
-                        { parse_mode: 'MarkdownV2' }
-                    );
+                    return bot.sendMessage(chatId, `👍 ${userName} теперь имеет ${updatedAura} aura.`);
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
@@ -83,11 +77,7 @@ bot.on('text', async (msg) => {
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(
-                        chatId,
-                        `🤡 [${userName}](tg://user?id=${userData.id}) теперь имеет ${updatedAura} aura.`,
-                        { parse_mode: 'MarkdownV2' }
-                    );
+                    return bot.sendMessage(chatId, `🤡 ${userName} теперь имеет ${updatedAura} aura.`);
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
