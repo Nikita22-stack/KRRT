@@ -78,7 +78,7 @@ bot.on('text', async (msg) => {
                     // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(chatId, `🤡 ${userName} теперь имеет ${updatedAura} aura.`);
+                    return bot.sendMessage(chatId, `🤡 [${userName}](tg://user?id=${userId}) теперь имеет ${updatedAura} aura.`, { parseMode: 'Markdown' });
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
