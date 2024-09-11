@@ -1,5 +1,5 @@
 import TeleBot from 'telebot';
-import { database, ref, get } from './config';
+import { database, ref, get } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
