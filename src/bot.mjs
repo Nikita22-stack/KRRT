@@ -3,28 +3,30 @@ import { database, ref, get } from './config.mjs';
 
 const bot = new TeleBot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.on('/rep', (msg) => {
+bot.on('/rep', async (msg) => {
     const chatId = msg.chat.id;
-    const userRef = ref(database, 'user');
 
-    get(userRef).then((snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            let repMessage = 'Количество rep:\n';
+    // Создаем ссылку на все данные в узле 'user'
+    const usersRef = ref(database, 'user');
+    const snapshot = await get(usersRef);
 
-            // Проходим по всем пользователям и добавляем их значения rep в сообщение
-            for (const userId in data) {
-                if (data[userId].rep) {
-                    repMessage += `${userId}: ${data[userId].rep}\n`;
-                }
-            }
+    if (snapshot.exists()) {
+        const data = snapshot.val();
+        let response = 'Количество реп для всех пользователей:\n';
 
-            return bot.sendMessage(chatId, repMessage);
+        // Проходимся по всем пользователям и добавляем их данные в сообщение
+        for (const [user, info] of Object.entries(data)) {
+            response += `${user}: ${info.rep}\n`;
         }
-    });
+
+        return bot.sendMessage(chatId, response);
+    } else {
+        return bot.sendMessage(chatId, 'Данные не найдены.');
+    }
 });
 
 export default bot;
+
 
 
 
