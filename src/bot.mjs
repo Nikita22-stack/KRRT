@@ -10,7 +10,6 @@ bot.on('text', async (msg) => {
 
     // Проверяем, содержит ли сообщение слово 'aura'
     if (messageText.toLowerCase() === 'aura') {
-        // Создаем ссылку на все данные в узле 'users'
         const usersRef = ref(database, 'user');
         const snapshot = await get(usersRef);
 
@@ -18,7 +17,6 @@ bot.on('text', async (msg) => {
             const data = snapshot.val();
             let response = '🧿 Количество aura 🧿\n\n';
 
-            // Проходимся по всем пользователям и добавляем их данные в сообщение
             for (const [users, info] of Object.entries(data)) {
                 response += `${users}: ${info.aura}\n`;
             }
@@ -32,11 +30,19 @@ bot.on('text', async (msg) => {
         const parts = messageText.split(' ');
 
         if (parts.length === 3) {
-            const userName = parts[1];
+            const userName = parts[1].toLowerCase();
             const auraToAdd = parseInt(parts[2], 10);
 
-            if (!isNaN(auraToAdd)) {
-                const userRef = ref(database, `users/${userName}`);
+            const normalizedNames = {
+                'вадим': 'Вадим',
+                'никита': 'Никита',
+                'ярик': 'Ярик'
+            };
+
+            const databaseUserName = normalizedNames[userName];
+
+            if (databaseUserName && !isNaN(auraToAdd)) {
+                const userRef = ref(database, `user/${databaseUserName}`);
                 const userSnapshot = await get(userRef);
 
                 if (userSnapshot.exists()) {
@@ -44,10 +50,9 @@ bot.on('text', async (msg) => {
                     const updatedAura = userData.aura + auraToAdd;
                     const userId = userData.id;
 
-                    // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(chatId, `👍 [${userName}](tg://user?id=${userId}) теперь имеет ${updatedAura} aura.`, { parseMode: 'Markdown' });
+                    return bot.sendMessage(chatId, `👍 [${databaseUserName}](tg://user?id=${userId}) теперь имеет ${updatedAura} aura.`, { parseMode: 'Markdown' });
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
@@ -59,27 +64,34 @@ bot.on('text', async (msg) => {
         }
     }
 
-    // Проверяем, начинается ли сообщение с '+aura'
+    // Проверяем, начинается ли сообщение с '-aura'
     if (messageText.startsWith('-aura')) {
         const parts = messageText.split(' ');
 
         if (parts.length === 3) {
-            const userName = parts[1];
-            const auraToAdd = parseInt(parts[2], 10);
+            const userName = parts[1].toLowerCase();
+            const auraToRemove = parseInt(parts[2], 10);
 
-            if (!isNaN(auraToAdd)) {
-                const userRef = ref(database, `users/${userName}`);
+            const normalizedNames = {
+                'вадим': 'Вадим',
+                'никита': 'Никита',
+                'ярик': 'Ярик'
+            };
+
+            const databaseUserName = normalizedNames[userName];
+
+            if (databaseUserName && !isNaN(auraToRemove)) {
+                const userRef = ref(database, `user/${databaseUserName}`);
                 const userSnapshot = await get(userRef);
 
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.val();
-                    const updatedAura = userData.aura - auraToAdd;
+                    const updatedAura = userData.aura - auraToRemove;
                     const userId = userData.id;
 
-                    // Обновляем значение 'aura' в базе данных
                     await update(userRef, { aura: updatedAura });
 
-                    return bot.sendMessage(chatId, `🤡 [${userName}](tg://user?id=${userId}) теперь имеет ${updatedAura} aura.`, { parseMode: 'Markdown' });
+                    return bot.sendMessage(chatId, `🤡 [${databaseUserName}](tg://user?id=${userId}) теперь имеет ${updatedAura} aura.`, { parseMode: 'Markdown' });
                 } else {
                     return bot.sendMessage(chatId, `Пользователь ${userName} не найден.`);
                 }
@@ -87,7 +99,7 @@ bot.on('text', async (msg) => {
                 return bot.sendMessage(chatId, 'Введите корректное количество aura.');
             }
         } else {
-            return bot.sendMessage(chatId, 'Используйте формат: +aura <имя пользователя> <количество>');
+            return bot.sendMessage(chatId, 'Используйте формат: -aura <имя пользователя> <количество>');
         }
     }
 
