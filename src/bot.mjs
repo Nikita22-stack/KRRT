@@ -10,7 +10,7 @@ bot.on('text', async (msg) => {
 
     // Проверяем, содержит ли сообщение слово 'aura'
     if (messageText.toLowerCase() === 'aura') {
-        // Создаем ссылку на все данные в узле 'user'
+        // Создаем ссылку на все данные в узле 'users'
         const usersRef = ref(database, 'user');
         const snapshot = await get(usersRef);
 
@@ -19,8 +19,8 @@ bot.on('text', async (msg) => {
             let response = '🧿 Количество aura 🧿\n\n';
 
             // Проходимся по всем пользователям и добавляем их данные в сообщение
-            for (const [user, info] of Object.entries(data)) {
-                response += `${user}: ${info.aura}\n`;
+            for (const [users, info] of Object.entries(data)) {
+                response += `${users}: ${info.aura}\n`;
             }
 
             return bot.sendMessage(chatId, response);
@@ -36,7 +36,7 @@ bot.on('text', async (msg) => {
             const auraToAdd = parseInt(parts[2], 10);
 
             if (!isNaN(auraToAdd)) {
-                const userRef = ref(database, `user/${userName}`);
+                const userRef = ref(database, `users/${userName}`);
                 const userSnapshot = await get(userRef);
 
                 if (userSnapshot.exists()) {
@@ -68,7 +68,7 @@ bot.on('text', async (msg) => {
             const auraToAdd = parseInt(parts[2], 10);
 
             if (!isNaN(auraToAdd)) {
-                const userRef = ref(database, `user/${userName}`);
+                const userRef = ref(database, `users/${userName}`);
                 const userSnapshot = await get(userRef);
 
                 if (userSnapshot.exists()) {
