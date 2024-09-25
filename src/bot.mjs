@@ -9,7 +9,7 @@ bot.on('text', async (msg) => {
     const messageText = msg.text.trim();
 
     // Проверяем, содержит ли сообщение слово 'aura'
-    if (messageText.toLowerCase() === 'aura' || 'аура') {
+    if (messageText.toLowerCase() === 'aura') {
         const usersRef = ref(database, 'user');
         const snapshot = await get(usersRef);
 
@@ -26,7 +26,7 @@ bot.on('text', async (msg) => {
     }
 
     // Проверяем, начинается ли сообщение с '+aura'
-    if (messageText.startsWith('+aura' || '+аура')) {
+    if (messageText.startsWith('+aura')) {
         const parts = messageText.split(' ');
 
         if (parts.length === 3) {
@@ -65,7 +65,7 @@ bot.on('text', async (msg) => {
     }
 
     // Проверяем, начинается ли сообщение с '-aura'
-    if (messageText.startsWith('-aura' || '-аура')) {
+    if (messageText.startsWith('-aura')) {
         const parts = messageText.split(' ');
 
         if (parts.length === 3) {
